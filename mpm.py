@@ -1,16 +1,26 @@
-### MPM: MetaPatternModel
 import string
 from anthropic import Client
-from groq import Groq
 
 class GlobalRelativeTokenizer:
     def __init__(self):
+        """
+        Initializes the tokenizer with default values and tokens.
+        """
         self.context_size = 500
         self.token_to_value = {'<EOP>': 0}  # Assign 0 to the <EOP> token
         self.value_to_token = {0: '<EOP>'}  # Assign <EOP> to the value 0
         self.next_value = 1  # Start assigning values from 1
 
     def tokenize(self, text):
+        """
+        Tokenizes the given text into numerical values based on unique words.
+
+        Parameters:
+        text (str): The text to be tokenized.
+
+        Returns:
+        list: A list of numerical tokens representing the text.
+        """
         tokens = text.split(" ")
         relative_tokens = []
         for token in tokens:
@@ -22,57 +32,80 @@ class GlobalRelativeTokenizer:
         return relative_tokens
 
     def detokenize(self, relative_tokens):
+        """
+        Converts numerical tokens back into text.
+
+        Parameters:
+        relative_tokens (list): A list of numerical tokens.
+
+        Returns:
+        str: The detokenized text.
+        """
         tokens = [self.value_to_token[value] for value in relative_tokens]
         return ' '.join(tokens)
 
 def filter_text(text):
+    """
+    Filters and cleans the input text by converting to lowercase and removing punctuation.
+
+    Parameters:
+    text (str): The text to be filtered.
+
+    Returns:
+    str: The filtered text.
+    """
     text = text.lower()
     text = text.translate(str.maketrans('', '', string.punctuation.replace(":", '').replace("\\", "")))
     return text
 
 class ClaudeMetaTranslator:
     def __init__(self, key: str, model: str = "claude-3-opus-20240229"):
+        """
+        Initializes the translator with API key and model.
+
+        Parameters:
+        key (str): The API key for accessing the translation service.
+        model (str): The model name to be used for translation.
+        """
         self.client = Client(api_key=key)
         self.model = model
         self.tokenizer = GlobalRelativeTokenizer()
 
     def translate(self, input_prompt: str, pairs: str):
+        """
+        Translates the input prompt based on the provided translation pairs.
+
+        Parameters:
+        input_prompt (str): The source sequence to be translated.
+        pairs (str): The translation pairs for reference.
+
+        Returns:
+        str: The translated output.
+        """
         pairs, input_prompt = self.preprocess(pairs, input_prompt)
-        system = """You Claude, skilled at finding general sequence-to-sequence patterns in data. In this case, there are 'source' and 'target' sequences.
-        I'll provide you with some translation pairs and your task is to generate the 'target' sequence corresponding to the given 'source' sequence.
-        These are language translation pairings, but each unique word in the target has been assigned a number. Thus, the overall patterns should be linguistic in nature.
-        Take a deep breath, clear your mind, and think this through step by step, outlining your evidence for each decision.
-        """
-        message = f"""Based on the provided translation pairs and your own intelligence, generate the 'target' sequence corresponding to the given 'source' sequence.
-        
-        1. First, create a 'target word bank' of target numbers that will probably occur given the source sequence. Write out the probable target numbers, and say why you think each is probable. Essentially create a mapping of source phrases to target sequences.
-        2. Formulate gramatical rules that seem aparent in the target texts, and are relavent to the sequence you will translate.
-        3. Next, focus on arranging these target numbers in the correct order to form a coherent translation, also say why.
-        4. Remember: don't copy any of the examples verbatum, just use the underlying linguistic rules that seem apparent.
-        5. Avoid repetition.
-        Here are the translation pairs:
-        6. Only predict tokens that have already been used.
-        Here are the pairs:
-        {pairs}
-        
-        Source Sequence:
-        {input_prompt}
-        
-        Remember, the last part of your response should follow this format 'target: <some output>'
-        Think through each step, write out your thought process, be concise, and use the examples provided.
-        Do your best, don't stress about it, use the format. My friend doesn't think you can do this well, but I am fully confident you can prove him wrong.
-        """
+        system = SYSTEM_PROMPT
+        message = MESSAGE_PROMPT.format(pairs=pairs, input_prompt=input_prompt)
         output = self.send_message(message, system)
         return output
 
     def send_message(self, message, system):
+        """
+        Sends a message to the translation service and retrieves the output.
+
+        Parameters:
+        message (str): The message to be sent.
+        system (str): The system prompt.
+
+        Returns:
+        str: The output from the translation service.
+        """
         chat_completion = self.client.messages.create(
             model=self.model,
             system=system,
             messages=[
                 {"role": "user", "content": message}
             ],
-            temperature=0.01,
+            temperature=0.7,
             max_tokens=2048
         )
         output = chat_completion.content[0].text
@@ -80,6 +113,16 @@ class ClaudeMetaTranslator:
         return output
     
     def preprocess(self, pairs, input_prompt):
+        """
+        Preprocesses the translation pairs and input prompt for translation.
+
+        Parameters:
+        pairs (str): The translation pairs.
+        input_prompt (str): The source sequence to be translated.
+
+        Returns:
+        tuple: Processed pairs and input prompt.
+        """
         lines = pairs.split("\n")
         new_pairs = []
         for line in lines:
@@ -92,8 +135,53 @@ class ClaudeMetaTranslator:
         new_pairs = "\n".join(new_pairs)
         return new_pairs, input_prompt
 
+def extract_numbers(text):
+    """
+    Extracts numerical tokens from the given text.
+
+    Parameters:
+    text (str): The text containing numerical tokens.
+
+    Returns:
+    list: A list of numerical tokens extracted from the text.
+    """
+    import re
+    pattern = r'target:\s*(\d+(?:\s+\d+)*)'
+    matches = re.findall(pattern, text)
+    if matches:
+        last_match = matches[-1]
+        return last_match.split()
+    return []
+
+# Constants for prompts
+SYSTEM_PROMPT = """You Claude, skilled at finding general sequence-to-sequence patterns in data. In this case, there are 'source' and 'target' sequences.
+I'll provide you with some translation pairs and your task is to generate the 'target' sequence corresponding to the given 'source' sequence.
+These are language translation pairings, but each unique word in the target has been assigned a number. Thus, the overall patterns should be linguistic in nature.
+Take a deep breath, clear your mind, and think this through step by step, outlining your evidence for each decision.
+"""
+
+MESSAGE_PROMPT = """Based on the provided translation pairs and your own intelligence, generate the 'target' sequence corresponding to the given 'source' sequence.
+
+1. First, create a 'target word bank' of target numbers that will probably occur given the source sequence. Write out the probable target numbers, and say why you think each is probable. Essentially create a mapping of source phrases to target sequences.
+2. Formulate grammatical rules that seem apparent in the target texts, and are relevant to the sequence you will translate.
+3. Next, focus on arranging these target numbers in the correct order to form a coherent translation, also say why.
+4. Remember: don't copy any of the examples verbatim, just use the underlying linguistic rules that seem apparent.
+5. Avoid repetition.
+Here are the translation pairs:
+6. Only predict tokens that have already been used.
+Here are the pairs:
+{pairs}
+
+Source Sequence:
+{input_prompt}
+
+Remember, the last part of your response should follow this format 'target: <some output>'
+Think through each step, write out your thought process, be concise, and use the examples provided.
+Do your best, don't stress about it, use the format. My friend doesn't think you can do this well, but I am fully confident you can prove him wrong.
+"""
+
 # Example usage:
-claude_key  = <put your key here>
+claude_key = key here
 translator = ClaudeMetaTranslator(claude_key)
 
 pairs = """
@@ -159,17 +247,6 @@ target: Then Jeroboam built Shechem in the hill country of Ephraim, and lived th
 
 input_prompt = "source: Und er baute Städte im Gebirge Juda; und in den Wäldern baute er Burgen und Türme.".lower()
 output = translator.translate(input_prompt, pairs)
-
-
-import re
-
-def extract_numbers(text):
-    pattern = r'target:\s*(\d+(?:\s+\d+)*)'
-    matches = re.findall(pattern, text)
-    if matches:
-        last_match = matches[-1]
-        return last_match.split()
-    return []
 
 # Extract numerical representations from the output
 target_numbers = extract_numbers(output)
