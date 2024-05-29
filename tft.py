@@ -105,7 +105,7 @@ class TFT(nn.Module):
         return x
 
 # Load the data
-file_path = 'data.txt'
+file_path = 'synthetic3.txt'
 context_size = 10
 dataset = TextDataset(file_path, context_size)
 dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
