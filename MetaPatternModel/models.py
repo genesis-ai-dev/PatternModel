@@ -1,5 +1,17 @@
+"""
+models.py
+
+Contains a `GlobalRelativeTokenizer` which is a slight modification to RelativeTokenizer.
+- Both GPT4MetaTranslator and ClaudeMetaTranslator use it to convert target sequences into ints 
+where each unique word is assigned an int. The model (Claude, GPT-4o, etc..) is then tasked with
+identifying which source sequences map to target sequences (this is now language agnostic because of the tokenization)
+Then it is given a new source sequence and told to convert it to a similar list of ints, the result is then detokenized back into the target language. 
+- This should force pattern matching and work well regardless of the language.
+"""
 import string
 from anthropic import Client
+from openai import OpenAI
+
 
 class GlobalRelativeTokenizer:
     def __init__(self):
@@ -58,6 +70,83 @@ def filter_text(text):
     text = text.translate(str.maketrans('', '', string.punctuation.replace(":", '').replace("\\", "")))
     return text
 
+
+
+class GPT4MetaTranslator:
+    def __init__(self, api_key: str, model: str = "gpt-4o"):
+        """
+        Initializes the translator with API key and model.
+
+        Parameters:
+        api_key (str): The API key for accessing the translation service.
+        model (str): The model name to be used for translation.
+        """
+        self.client = OpenAI(api_key=api_key)
+        self.model = model
+        self.tokenizer = GlobalRelativeTokenizer()
+
+    def translate(self, input_prompt: str, pairs: str):
+        """
+        Translates the input prompt based on the provided translation pairs.
+
+        Parameters:
+        input_prompt (str): The source sequence to be translated.
+        pairs (str): The translation pairs for reference.
+
+        Returns:
+        str: The translated output.
+        """
+        pairs, input_prompt = self.preprocess(pairs, input_prompt)
+        system = SYSTEM_PROMPT
+        message = MESSAGE_PROMPT.format(pairs=pairs, input_prompt=input_prompt)
+        output = self.send_message(message, system)
+        return output
+
+    def send_message(self, message, system):
+        """
+        Sends a message to the translation service and retrieves the output.
+
+        Parameters:
+        message (str): The message to be sent.
+        system (str): The system prompt.
+
+        Returns:
+        str: The output from the translation service.
+        """
+        response = self.client.chat.completions.create(model=self.model,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": message}
+        ],
+        temperature=0.01,
+        max_tokens=2048)
+        output = response.choices[0].message.content
+        print(output)
+        return output
+
+    def preprocess(self, pairs, input_prompt):
+        """
+        Preprocesses the translation pairs and input prompt for translation.
+
+        Parameters:
+        pairs (str): The translation pairs.
+        input_prompt (str): The source sequence to be translated.
+
+        Returns:
+        tuple: Processed pairs and input prompt.
+        """
+        lines = pairs.split("\n")
+        new_pairs = []
+        for line in lines:
+            if line.startswith("source:"):
+                new_pairs.append(line)
+            elif line.startswith("target:"):
+                target_text = filter_text(line[len("target: "):])
+                tokenized_target = 'target: ' + ' '.join(map(str, self.tokenizer.tokenize(target_text)))
+                new_pairs.append(tokenized_target)
+        new_pairs = "\n".join(new_pairs)
+        return new_pairs, input_prompt
+
 class ClaudeMetaTranslator:
     def __init__(self, key: str, model: str = "claude-3-opus-20240229"):
         """
@@ -105,13 +194,13 @@ class ClaudeMetaTranslator:
             messages=[
                 {"role": "user", "content": message}
             ],
-            temperature=0.7,
+            temperature=0.01,
             max_tokens=2048
         )
         output = chat_completion.content[0].text
         print(output)
         return output
-    
+
     def preprocess(self, pairs, input_prompt):
         """
         Preprocesses the translation pairs and input prompt for translation.
@@ -154,7 +243,7 @@ def extract_numbers(text):
     return []
 
 # Constants for prompts
-SYSTEM_PROMPT = """You Claude, skilled at finding general sequence-to-sequence patterns in data. In this case, there are 'source' and 'target' sequences.
+SYSTEM_PROMPT = """You are a Translator, skilled at finding general sequence-to-sequence patterns in data. In this case, there are 'source' and 'target' sequences.
 I'll provide you with some translation pairs and your task is to generate the 'target' sequence corresponding to the given 'source' sequence.
 These are language translation pairings, but each unique word in the target has been assigned a number. Thus, the overall patterns should be linguistic in nature.
 Take a deep breath, clear your mind, and think this through step by step, outlining your evidence for each decision.
