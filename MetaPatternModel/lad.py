@@ -5,8 +5,8 @@ class LinguisticAnomalyDetector:
     Class for performing Linguistic Anomaly Detection (LAD) on texts.
     """
     def __init__(self, source_reference, target_reference):
-        self.source_references = source_reference.split("\n")
-        self.target_references = target_reference.split("\n")
+        self.source_references = source_reference
+        self.target_references = target_reference
         assert len(self.source_references) == len(self.target_references), "The reference texts must have the same number of lines."
         self.scores = []
 

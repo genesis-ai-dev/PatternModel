@@ -4,8 +4,8 @@ models.py
 Contains a `GlobalRelativeTokenizer` which is a slight modification to RelativeTokenizer.
 - Both GPT4MetaTranslator and ClaudeMetaTranslator use it to convert target sequences into ints 
 where each unique word is assigned an int. The model (Claude, GPT-4o, etc..) is then tasked with
-identifying which source sequences map to target sequences (this is now language agnostic because of the tokenization)
-Then it is given a new source sequence and told to convert it to a similar list of ints, the result is then detokenized back into the target language. 
+figuring out which source sequences map to target sequences (this is now language agnostic because of the tokenization)
+Then, it is given a new source sequence and told to convert it to a similar list of ints, the result is then detokenized back into the target language. 
 - This should force pattern matching and work well regardless of the language.
 """
 import string
