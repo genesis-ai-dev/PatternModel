@@ -1,6 +1,7 @@
 """
 Where a "Golden Path" tells which examples one needs to curate in order for an optimal dataset, a silver path takes whatever examples you may already have and determines what will most easily be translated given what you already have. 
-This can help provide a metric for how confident one should be about a generated translation, as well as a means of determining which materials might be highest priority. 
+This can help provide a metric for how confident one should be about a generated translation, 
+as well as a means of determining which materials might be highest priority. 
 """
 import os
 import json
@@ -47,10 +48,12 @@ class SilverPath:
         with open(output_file, "w") as file:
             for prompt in tqdm.tqdm(self.prompts):
                 rank = self.search(prompt)
-                data = {"prompt": prompt, "rank": rank}
+                data = {"prompt": prompt, "rank": rank, "index": self.prompts.index(prompt)}
                 file.write(json.dumps(data) + "\n")
 
-# Usage
-data_dir = "/Users/daniellosey/Desktop/code/biblica/pattern model/languages"
-silver_path = SilverPath(data_dir)
-silver_path.rank_prompts()
+
+if __name__ == "__main__":
+    # Usage
+    data_dir = "/languages"
+    silver_path = SilverPath(data_dir)
+    silver_path.rank_prompts()
