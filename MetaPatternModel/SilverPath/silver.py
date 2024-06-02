@@ -54,6 +54,6 @@ class SilverPath:
 
 if __name__ == "__main__":
     # Usage
-    data_dir = "/languages"
+    data_dir = "/Users/daniellosey/Desktop/code/biblica/pattern model/languages"
     silver_path = SilverPath(data_dir)
     silver_path.rank_prompts()
