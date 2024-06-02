@@ -1,3 +1,6 @@
+"""lad.py
+Linguistic Anomaly Detection
+"""
 from difflib import SequenceMatcher
 
 class LinguisticAnomalyDetector:

@@ -1,5 +1,4 @@
-"""
-models.py
+"""models.py
 
 Contains a `GlobalRelativeTokenizer` which is a slight modification to RelativeTokenizer.
 - Both GPT4MetaTranslator and ClaudeMetaTranslator use it to convert target sequences into ints 

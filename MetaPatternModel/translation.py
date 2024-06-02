@@ -1,3 +1,6 @@
+"""translation.py
+Automatic translation.
+"""
 import os
 from models import ClaudeMetaTranslator, GPT4MetaTranslator, extract_numbers
 from lad import LinguisticAnomalyDetector
@@ -66,8 +69,7 @@ class Translator:
 
 
 def main():
-    data_dir = "languages"  # Directory containing source.txt, target.txt, and prompts.txt
-
+    data_dir = "/Users/daniellosey/Desktop/code/biblica/pattern model/languages"  # Directory containing source.txt, target.txt, and prompts.txt
     translator = Translator(data_dir, claude_key)
     
     resume_from = 0  # Index of the prompt to resume from (0 to start from the beginning)

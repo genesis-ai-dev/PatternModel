@@ -1,4 +1,4 @@
-"""
+"""silver.py
 Where a "Golden Path" tells which examples one needs to curate in order for an optimal dataset, a silver path takes whatever examples you may already have and determines what will most easily be translated given what you already have. 
 This can help provide a metric for how confident one should be about a generated translation, 
 as well as a means of determining which materials might be highest priority. 
