@@ -13,8 +13,8 @@ import tqdm
 class SilverPath:
     def __init__(self, data_dir: str, max_rank: int = 100):
         self.data_dir = data_dir
-        self.source_texts = self.load_text_file("source.txt")[:5000]
-        self.target_texts = self.load_text_file("target.txt")[:5000]
+        self.source_texts = self.load_text_file("source.txt")
+        self.target_texts = self.load_text_file("target.txt")
         self.prompts = self.load_text_file("prompts.txt")
         self.max_rank = max_rank
         self.vectorizer = TfidfVectorizer()

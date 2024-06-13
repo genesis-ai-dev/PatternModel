@@ -34,7 +34,7 @@ class Translator:
     def load_text_file(self, file_name: str) -> list[str]:
         file_path = os.path.join(self.data_dir, file_name)
         with open(file_path, "r") as file:
-            return [line.strip().lower().translate(str.maketrans('', '', string.punctuation)) for line in file][:5000]
+            return [line.strip().lower().translate(str.maketrans('', '', string.punctuation)) for line in file]
     
     def translate(self, resume_from: int = 0) -> None:
         output_file = os.path.join(self.data_dir, "output.txt")
