@@ -120,7 +120,6 @@ class GPT4MetaTranslator:
         temperature=0.01,
         max_tokens=2048)
         output = response.choices[0].message.content
-        print(output)
         return output
 
     def preprocess(self, pairs, input_prompt):
@@ -197,7 +196,6 @@ class ClaudeMetaTranslator:
             max_tokens=2048
         )
         output = chat_completion.content[0].text
-        print(output)
         return output
 
     def preprocess(self, pairs, input_prompt):
@@ -257,13 +255,13 @@ MESSAGE_PROMPT = """Based on the provided translation pairs and your own intelli
 5. Avoid repetition.
 Here are the translation pairs:
 6. Only predict tokens that have already been used.
+7. This may be the most important: The order of subsequences may change, don't simply do a 1-1 word for word literal translation, be smart.
 Here are the pairs:
 {pairs}
 
 Source Sequence:
 {input_prompt}
-
-Remember, the last part of your response should follow this format 'target: <some output>'
-Think through each step, write out your thought process, be concise, and use the examples provided.
-Do your best, don't stress about it, use the format. My friend doesn't think you can do this well, but I am fully confident you can prove him wrong.
+Firstly, follow your guidelinse and create a draft translation, then create a backtranslation of your draft back into the source language, then as a final step output a final improved translation.
+Remember, the last part of your final response should follow this format 'target: <some output>'
+Think through each step, write out your thought process, be concise, and use the examples provided. Take a deep breath.
 """

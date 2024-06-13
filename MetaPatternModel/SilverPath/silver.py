@@ -13,11 +13,10 @@ import tqdm
 class SilverPath:
     def __init__(self, data_dir: str, max_rank: int = 100):
         self.data_dir = data_dir
-        self.source_texts = self.load_text_file("source.txt")
-        self.target_texts = self.load_text_file("target.txt")
+        self.source_texts = self.load_text_file("source.txt")[:5000]
+        self.target_texts = self.load_text_file("target.txt")[:5000]
         self.prompts = self.load_text_file("prompts.txt")
         self.max_rank = max_rank
-        
         self.vectorizer = TfidfVectorizer()
         self.vectorizer.fit(self.source_texts)
 
@@ -42,7 +41,9 @@ class SilverPath:
             query_words -= similar_words
             rank += 1
         return rank
-
+    def order_prompts_based_on_rank(self):
+        ranked_prompts = sorted(self.prompts, key=lambda prompt: self.search(prompt), reverse=True)
+        return ranked_prompts
     def rank_prompts(self) -> None:
         output_file = os.path.join(self.data_dir, "ranked_prompts.jsonl")
         with open(output_file, "w") as file:
