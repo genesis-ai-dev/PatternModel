@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+  <style>
+    text { font-family: Arial, sans-serif; font-size: 14px; }
+    .title { font-size: 24px; font-weight: bold; }
+    .subtitle { font-size: 18px; font-weight: bold; }
+    .small { font-size: 12px; }
+    .benefit { fill: #1a5f7a; }
+  </style>
+  
+  <!-- Title -->
+  <text x="500" y="30" text-anchor="middle" class="title">Relative Tokenizer: Process and Benefits</text>
+  
+  <!-- English Example -->
+  <text x="250" y="70" text-anchor="middle" class="subtitle">English Example</text>
+  
+  <text x="50" y="100">Input 1: "The cat sat on the mat"</text>
+  <text x="50" y="120">Tokenization: [1, 2, 3, 4, 1, 5]</text>
+  
+  <text x="50" y="150">Input 2: "The dog ran in the park"</text>
+  <text x="50" y="170">Tokenization: [1, 2, 3, 4, 1, 5]</text>
+  
+  <!-- Token Mapping for English -->
+  <rect x="50" y="190" width="180" height="160" fill="none" stroke="black" />
+  <text x="60" y="210" font-weight="bold">Token Mapping (Input 1):</text>
+  <text x="60" y="230">1 : "the"</text>
+  <text x="60" y="250">2 : "cat"</text>
+  <text x="60" y="270">3 : "sat"</text>
+  <text x="60" y="290">4 : "on"</text>
+  <text x="60" y="310">5 : "mat"</text>
+  
+  <rect x="250" y="190" width="180" height="160" fill="none" stroke="black" />
+  <text x="260" y="210" font-weight="bold">Token Mapping (Input 2):</text>
+  <text x="260" y="230">1 : "the"</text>
+  <text x="260" y="250">2 : "dog"</text>
+  <text x="260" y="270">3 : "ran"</text>
+  <text x="260" y="290">4 : "in"</text>
+  <text x="260" y="310">5 : "park"</text>
+  
+  <!-- French Example -->
+  <text x="750" y="70" text-anchor="middle" class="subtitle">French Example</text>
+  
+  <text x="550" y="100">Input: "Le chat s'est assis sur le tapis"</text>
+  <text x="550" y="120">Tokenization: [1, 2, 3, 4, 5, 1, 6]</text>
+  
+  <!-- Token Mapping for French -->
+  <rect x="550" y="190" width="180" height="180" fill="none" stroke="black" />
+  <text x="560" y="210" font-weight="bold">Token Mapping:</text>
+  <text x="560" y="230">1 : "le"</text>
+  <text x="560" y="250">2 : "chat"</text>
+  <text x="560" y="270">3 : "s'est"</text>
+  <text x="560" y="290">4 : "assis"</text>
+  <text x="560" y="310">5 : "sur"</text>
+  <text x="560" y="330">6 : "tapis"</text>
+  
+  <!-- Process Arrows -->
+  <line x1="140" y1="360" x2="140" y2="400" stroke="black" stroke-width="2" />
+  <line x1="330" y1="360" x2="330" y2="400" stroke="black" stroke-width="2" />
+  <line x1="640" y1="380" x2="640" y2="400" stroke="black" stroke-width="2" />
+  <polygon points="135,400 145,400 140,410" fill="black" />
+  <polygon points="325,400 335,400 330,410" fill="black" />
+  <polygon points="635,400 645,400 640,410" fill="black" />
+  
+  <!-- Process Description -->
+  <rect x="50" y="420" width="900" height="100" fill="#f0f0f0" stroke="black" />
+  <text x="60" y="440" font-weight="bold">Relative Tokenizer Process:</text>
+  <text x="60" y="460">1. Start with an empty token-to-ID mapping for each new input.</text>
+  <text x="60" y="480">2. Assign IDs to tokens sequentially as they appear (first unique token gets ID 1, second gets ID 2, etc.).</text>
+  <text x="60" y="500">3. If a token repeats, it receives the same ID as its first occurrence.</text>
+  
+  <!-- Benefits -->
+  <text x="500" y="550" text-anchor="middle" class="subtitle">Key Benefits</text>
+  
+  <rect x="50" y="570" width="280" height="60" fill="#e6f3f8" stroke="#1a5f7a" />
+  <text x="60" y="590" class="benefit">1. Forces Model Generalization</text>
+  <text x="60" y="610" class="small">Focuses on patterns rather than</text>
+  <text x="60" y="625" class="small">specific word-meaning associations</text>
+  
+  <rect x="360" y="570" width="280" height="60" fill="#e6f3f8" stroke="#1a5f7a" />
+  <text x="370" y="590" class="benefit">2. Handles Rare Words Effectively</text>
+  <text x="370" y="610" class="small">No out-of-vocabulary problem;</text>
+  <text x="370" y="625" class="small">every word gets a token</text>
+  
+  <rect x="670" y="570" width="280" height="60" fill="#e6f3f8" stroke="#1a5f7a" />
+  <text x="680" y="590" class="benefit">3. Potential Cross-lingual Capabilities</text>
+  <text x="680" y="610" class="small">Focuses on structural patterns</text>
+  <text x="680" y="625" class="small">rather than specific words</text>
+  
+  <!-- Note -->
+  <text x="500" y="680" text-anchor="middle" font-style="italic" class="small">Note: Token mappings are reset for each new input, allowing for dynamic and context-specific tokenization</text>
+</svg>

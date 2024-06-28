@@ -1,3 +1,92 @@
+# Relative Tokenizer: A Novel Approach to Text Processing
+![Enhanced Relative Tokenizer Diagram](diagram.svg)
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [How It Works](#how-it-works)
+3. [Potential Benefits](#potential-benefits)
+4. [Example: Language Translation](#example-language-translation)
+5. [Challenges and Architectural Considerations](#challenges-and-architectural-considerations)
+6. [Conclusion](#conclusion)
+7. [Example: Language Agnostic Translation](#language-agnostic-translation)
+
+***Disclaimer, this is super expiremental! So I really have no idea how well it will work.***
+
+## Introduction
+
+A relative tokenizer is a text processing technique that assigns unique numerical identifiers to words or subword units within a given context, but resets this assignment for each new input sequence. I guess you can sorta think about it like a really bad text compression technique. But thats not the point. Unlike traditional tokenizers that maintain a fixed vocabulary across an entire dataset, relative tokenizers create a new, localized vocabulary for each input. While this may seem like a bad idea, and to be fair it might be, it does have some potentially usefull things about it.
+
+## How It Works
+
+1. For each input sequence (e.g., a sentence or paragraph):
+   - Start with an empty token-to-ID mapping.
+   - Assign IDs to tokens sequentially as they appear.
+   - The first unique token gets ID 1, the second gets ID 2, and so on.
+   - If a token repeats, it receives the same ID as its first occurrence.
+
+2. Reset this mapping for the next input sequence.
+
+For example:
+- Input 1: "The cat sat on the mat"
+  Tokenization: [1, 2, 3, 4, 1, 5]
+
+- Input 2: "The dog ran in the park"
+  Tokenization: [1, 2, 3, 4, 1, 5]
+
+Note that "the" gets ID 1 in both cases, but "cat" and "dog" both get ID 2 in their respective sequences.
+
+Note 2, you can also apply this like a "sliding window" where each possible window gets its own unique token mapping.
+
+Note 3, you can also assign random unique numbers rather than going up sequentially. This could help avoid a model which simply increments the output upwards rather than learning real patterns.
+
+## Potential Benefits
+
+1. Forcing Generalization: By removing consistent global token identities, the model is forced to learn patterns and relationships rather than memorizing specific word-meaning associations. It is context specific, and models should only ever output tokens they have aready seen during inference.
+
+2. Handling Rare Words: There's no out-of-vocabulary problem since every word gets a token, regardless of its frequency in the training data.
+
+3. Cross-lingual Capabilities: It could potentially help in cross-lingual tasks by focusing on structural patterns rather than specific words. (more on that after the conclusion)
+
+4. Reduced Preprocessing: No need to build and maintain a global vocabulary.
+
+5. Privacy: It's harder to reconstruct the original text from the tokenized version, which could be beneficial in privacy-sensitive applications.
+
+## Example: Language Translation (more on this later)
+
+Consider a machine translation task:
+
+1. Source sentence (English): "The cat sat on the mat"
+   Relative tokenization: [1, 2, 3, 4, 1, 5]
+
+2. Target sentence (French): "Le chat s'est assis sur le tapis"
+   Relative tokenization: [1, 2, 3, 4, 5, 1, 6]
+
+The model would learn to map the pattern [1, 2, 3, 4, 1, 5] to [1, 2, 3, 4, 5, 1, 6], focusing on the structural relationships rather than specific word translations. This could potentially help the model generalize better to unseen sentences and even assist in zero-shot translation to languages not seen during training.
+
+## Challenges and Architectural Considerations
+
+While relative tokenization offers interesting possibilities, it also presents challenges for traditional neural network architectures:
+
+1. Embedding Layer Problem: Standard embedding layers assume a fixed vocabulary and learn a unique vector for each token ID. With relative tokenization, the meaning of each ID changes for every input, making traditional embeddings ineffective.
+
+2. Loss of Global Semantics: Without consistent token identities across the dataset, the model can't learn global semantic meanings of words.
+
+3. Increased Reliance on Context: The model must rely heavily on contextual cues and structural patterns, which may require more sophisticated architectures.
+
+To address these challenges, potential architectural approaches could include:
+
+- Using positional encodings to provide consistent position information.
+- Implementing relative attention mechanisms that focus on token relationships rather than identities.
+- Designing architectures that can effectively capture and utilize local patterns and structural information.
+- Incorporating multi-scale processing to balance local and global information.
+
+## Conclusion
+
+The optimal model architecture for leveraging relative tokenization remains an open question. It may involve novel components or combinations of existing techniques from areas such as graph neural networks, self-attention mechanisms, or recursive neural networks.
+
+Relative tokenization presents an intriguing approach to text processing that forces models to focus on patterns and relationships rather than specific word identities. While it introduces challenges, it also opens up new possibilities for generalization and cross-lingual capabilities in natural language processing tasks.
+
+
 # Language-Agnostic Translation
 
 ## Overview
