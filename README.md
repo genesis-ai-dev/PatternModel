@@ -49,8 +49,6 @@ Note 3, you can also assign random unique numbers rather than going up sequentia
 
 4. Reduced Preprocessing: No need to build and maintain a global vocabulary.
 
-5. Privacy: It's harder to reconstruct the original text from the tokenized version, which could be beneficial in privacy-sensitive applications.
-
 ## Example: Language Translation (more on this later)
 
 Consider a machine translation task:
@@ -61,7 +59,7 @@ Consider a machine translation task:
 2. Target sentence (French): "Le chat s'est assis sur le tapis"
    Relative tokenization: [1, 2, 3, 4, 5, 1, 6]
 
-The model would learn to map the pattern [1, 2, 3, 4, 1, 5] to [1, 2, 3, 4, 5, 1, 6], focusing on the structural relationships rather than specific word translations. This could potentially help the model generalize better to unseen sentences and even assist in zero-shot translation to languages not seen during training.
+The model would learn to map the pattern [1, 2, 3, 4, 1, 5] to [1, 2, 3, 4, 5, 1, 6], focusing on the structural relationships rather than specific word translations. This could potentially help the model generalize better to unseen sentences and even assist in zero-shot translation to languages not seen during training. Note that IRL this would need lots more context and so that the patterns would be clearer to the model...
 
 ## Challenges and Architectural Considerations
 
